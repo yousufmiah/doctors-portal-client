@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  // useSendPasswordResetEmail,
+  useSendPasswordResetEmail,
   useSignInWithEmailAndPassword,
   useSignInWithGoogle,
 } from "react-firebase-hooks/auth";
@@ -8,11 +8,13 @@ import auth from "../../firebase.init";
 import { useForm } from "react-hook-form";
 import Loading from "../Shared/Loading";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-// import { sendPasswordResetEmail } from "firebase/auth";
-// import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useToken from "../../hooks/useToken";
 
 const Login = () => {
+  const [resetEmail, setResetEmail] = useState("");
+
   // sign in by google =================
   const [signInWithGoogle, googleUser, googleLoading, googleError] =
     useSignInWithGoogle(auth);
@@ -29,7 +31,10 @@ const Login = () => {
     useSignInWithEmailAndPassword(auth);
 
   //forget or reset password============
-  // const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(auth);
+  const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(auth);
+
+  // jwt token==============
+  const [token] = useToken(user || googleUser);
 
   let signInErrorMessage;
   const navigate = useNavigate();
@@ -37,11 +42,21 @@ const Login = () => {
   let from = location.state?.from?.pathname || "/";
 
   useEffect(() => {
-    if (user || googleUser) {
-      // console.log(user, googleUser);
+    // jwt token=================
+    if (token) {
+      // console.log(token);
       navigate(from, { replace: true });
     }
-  }, [user, googleUser, from, navigate]);
+  }, [token, from, navigate]);
+
+  //===========
+  // useEffect(() => {
+  //   if (user || googleUser) {
+  //     // console.log(user, googleUser);
+  //     navigate(from, { replace: true });
+  //   }
+  // }, [user, googleUser, from, navigate]);
+  // ===============
 
   // loading spinner==================
   if (loading || googleLoading) {
@@ -58,23 +73,21 @@ const Login = () => {
   // onsubmit=======================
   const onSubmit = (data) => {
     // console.log(data);
+    setResetEmail(data.email);
     signInWithEmailAndPassword(data.email, data.password);
   };
 
-  //forget or reset password====================
-  // const resetPassword = async (data) => {
-  //   console.log("clicked");
-  //   console.log(data);
-  //   const email = data.email;
-  //   // console.log(email);
-  //   await sendPasswordResetEmail(email);
-  //   if (email) {
-  //     toast("Sent email");
-  //   } else {
-  //     toast("Please enter your email address.");
-  //   }
-  //   email("");
-  // };
+  // forget or reset password====================
+  const resetPassword = () => {
+    // console.log(resetEmail);
+
+    if (resetEmail) {
+      sendPasswordResetEmail(resetEmail);
+      toast("Sent email");
+    } else {
+      toast("Please enter your email address.");
+    }
+  };
 
   return (
     <div className="flex h-screen justify-center items-center ">
@@ -174,14 +187,14 @@ const Login = () => {
           </p>
 
           {/* ==== forget or reset password ==== */}
-          {/* <p>
+          <p>
             <small>
               Forget Password?
               <button onClick={resetPassword} className="text-primary">
                 Reset Password
               </button>
             </small>
-          </p> */}
+          </p>
 
           {/* =====sign in with google */}
           <div className="divider">OR</div>

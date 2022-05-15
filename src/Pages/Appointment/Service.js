@@ -1,6 +1,6 @@
 import React from "react";
 
-const ServiceBK = ({ service, setTreatment }) => {
+const Service = ({ service, setTreatment }) => {
   const { name, slots } = service;
   return (
     <div className="card lg:max-w-lg bg-base-100 shadow-xl">
@@ -31,4 +31,4 @@ const ServiceBK = ({ service, setTreatment }) => {
   );
 };
 
-export default ServiceBK;
+export default Service;
