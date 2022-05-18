@@ -14,7 +14,9 @@ const AddDoctor = () => {
   } = useForm();
 
   const { data: services, isLoading } = useQuery("services", () =>
-    fetch("http://localhost:5000/service").then((res) => res.json())
+    fetch("https://afternoon-cliffs-74877.herokuapp.com/service").then((res) =>
+      res.json()
+    )
   );
   // console.log(services);
 
@@ -51,7 +53,7 @@ const AddDoctor = () => {
             img: img,
           };
           // send to your database
-          fetch("http://localhost:5000/doctor", {
+          fetch("https://afternoon-cliffs-74877.herokuapp.com/doctor", {
             method: "POST",
             headers: {
               "content-type": "application/json",
